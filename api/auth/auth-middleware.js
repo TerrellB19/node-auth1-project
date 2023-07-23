@@ -9,8 +9,7 @@ const User = require('../users/users-model')
 */
 const restricted = (req, res, next) => {
   try{
-    const data = req.body
-    if(data){
+    if(req.session.user){
       next()
     }
     else{
@@ -57,8 +56,9 @@ const checkUsernameFree = async (req, res, next) => {
 */
 const checkUsernameExists = async (req, res, next) => {
   try{
-    const user = await User.findBy({username: req.body.username })
-    if(user.length){
+    const users = await User.findBy({username: req.body.username })
+    if(users.length){
+      req.user = users[0]
       next()
     }else {
       next({status: 401, message: "Invalid credentials"})

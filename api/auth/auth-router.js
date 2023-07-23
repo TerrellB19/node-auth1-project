@@ -65,7 +65,18 @@ router.post('/register', checkPasswordLength, checkUsernameFree, async (req, res
   }
  */
   router.post('/login', checkUsernameExists, (req, res, next) => {
-    res.json('login')
+    const { password, username } = req.body
+
+    if(bcrypt.compareSync(password, req.user.password)){
+      //
+      req.session.user = req.user
+      res.status(200).json({
+        message: `Welcome ${username}!`
+      })
+    } else {
+      next({ status: 401, message: 'Invalid credentials' })
+    }
+
   })
 
 /**
@@ -83,8 +94,18 @@ router.post('/register', checkPasswordLength, checkUsernameFree, async (req, res
     "message": "no session"
   }
  */
-  router.get('/logout', (req, res, next) => {
-    res.json('auth')
+  router.get('/logout', async (req, res, next) => {
+    
+      if(req.session.user){
+        await req.session.destroy()
+        res.json(
+        {
+          message: "logged out"
+        }
+      )
+    } else {
+      next({status: 200, message: 'no session'})
+    }
   })
 
  
