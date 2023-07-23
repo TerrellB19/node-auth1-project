@@ -3,6 +3,7 @@ const express = require('express')
 const router = express.Router()
 const Users = require('./users-model')
 const { restricted } = require('../auth/auth-middleware')
+const bcrypt = require('bcryptjs')
 
 
 /**
@@ -31,6 +32,16 @@ const { restricted } = require('../auth/auth-middleware')
   router.get('/', restricted, async (req, res, next) => {
     try{
       const data = await Users.find()
+      res.status(200).json(data)
+    }catch(err){
+      next(err)
+    }
+    
+  })
+
+  router.get('/:id', restricted, async (req, res, next) => {
+    try{
+      const data = await Users.findById(req.params.id)
       res.status(200).json(data)
     }catch(err){
       next(err)
