@@ -95,16 +95,19 @@ router.post('/register', checkPasswordLength, checkUsernameFree, async (req, res
   }
  */
   router.get('/logout', async (req, res, next) => {
-    
-      if(req.session.user){
-        await req.session.destroy()
-        res.json(
-        {
-          message: "logged out"
-        }
-      )
-    } else {
-      next({status: 200, message: 'no session'})
+    try{
+        if(req.session.user){
+          await req.session.destroy()
+          res.json(
+          {
+            message: "logged out"
+          }
+        )
+      } else {
+        next({status: 200, message: 'no session'})
+      }
+    } catch(err){
+      next(err)
     }
   })
 
