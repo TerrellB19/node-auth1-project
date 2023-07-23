@@ -6,6 +6,8 @@ const {
   checkPasswordLength, 
   checkUsernameFree, 
   checkUsernameExists } = require('./auth-middleware')
+const User = require('../users/users-model')
+const bcrypt = require('bcryptjs')
 
 
 /**
@@ -30,10 +32,20 @@ const {
     "message": "Password must be longer than 3 chars"
   }
  */
-router.post('/register', 
-checkPasswordLength, 
-checkUsernameFree, (req, res, next) => {
-  res.json('register')
+router.post('/register', checkPasswordLength, checkUsernameFree, async (req, res, next) => {
+  try{
+    let { username, password } = req.body
+
+    const hash = bcrypt.hashSync(password, 10)
+    password = hash
+
+    const newUser = await User.add({username, password})
+
+    res.status(201).json(newUser)
+  } catch(err){
+    next(err)
+  }
+  
 })
 
 
