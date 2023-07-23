@@ -55,9 +55,14 @@ const checkUsernameFree = async (req, res, next) => {
     "message": "Invalid credentials"
   }
 */
-const checkUsernameExists = (req, res, next) => {
+const checkUsernameExists = async (req, res, next) => {
   try{
-    next()
+    const user = await User.findBy({username: req.body.username })
+    if(user.length){
+      next()
+    }else {
+      next({status: 401, message: "Invalid credentials"})
+    }
   }catch(err){
     next(err)
   }
@@ -73,7 +78,12 @@ const checkUsernameExists = (req, res, next) => {
 */
 const checkPasswordLength = (req, res, next) => {
   try{
-    next()
+    const { password } = req.body
+    if( !password || password.length < 3 ){
+      next({status: 422, message: "Password must be longer than 3 chars"})
+    } else {
+      next()
+    }
   }catch(err){
     next(err)
   }
